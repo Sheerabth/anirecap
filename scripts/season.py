@@ -85,7 +85,7 @@ def main():
         merged_srt += shift_srt(ep["srt"], clock)
         clock += ep_dur
     # concat FILTER (never the concat demuxer): cards are 30fps/1-15360 timebase,
-    # episodes 23.976fps/1-24000 — the demuxer mixes timebases and stretches video.
+    # episodes 23.976fps/1-24000: the demuxer mixes timebases and stretches video.
     season_srt = Path(out).with_suffix(".srt")
     season_srt.write_text(merged_srt)
     inputs = []

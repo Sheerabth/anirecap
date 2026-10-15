@@ -6,11 +6,11 @@ Battle-tested on a full 12-episode season (blind-agent verified: zero unassigned
 
 ## About
 
-**anirecap** turns anime episodes into narrated recap videos. It fuses a fandom-wiki episode summary with the episode's own subtitles: an agent maps every subtitle cue to a story beat (or to SKIP-with-reason for OPs, recaps, EDs, and previews), drafts fluent third-person voiceover sized by plot weight, cuts ~2-second clips that show each narrated line, and muxes a VO-only final with zero anime audio. Per-episode recaps sew into a season video with title cards, burned-in subs, and leveled audio. Inputs are your local episode files; everything renders with `ffmpeg` + free `edge-tts` — no API keys.
+**anirecap** turns anime episodes into narrated recap videos. It fuses a fandom-wiki episode summary with the episode's own subtitles: an agent maps every subtitle cue to a story beat (or to SKIP-with-reason for OPs, recaps, EDs, and previews), drafts fluent third-person voiceover sized by plot weight, cuts ~2-second clips that show each narrated line, and muxes a VO-only final with zero anime audio. Per-episode recaps sew into a season video with title cards, burned-in subs, and leveled audio. Inputs are your local episode files; everything renders with `ffmpeg` + free `edge-tts`: no API keys.
 
 ## The protocol (the whole thing)
 
-1. **Single source.** The fandom wiki episode page is canonical. Season context is gathered for *understanding only* — nothing enters the VO unless this episode's footage proves it.
+1. **Single source.** The fandom wiki episode page is canonical. Season context is gathered for *understanding only*: nothing enters the VO unless this episode's footage proves it.
 2. **Full-coverage map.** The entire transcript is split into sections; every section maps to a story beat or to SKIP-with-reason (OP/recaps/EDs/previews, flash-forward cold opens). Unassigned cue count must be zero. Saved as `work/map_<ep>.json`.
 3. **Beats from the map only.** Fluent third-person English narration (never character dialogue), 4–7 clips per beat at ~2s each, story-chronological order, every timestamp an exact subtitle cue start.
 4. **Scripts render.** Per-beat TTS → video-only cuts matched to VO durations → VO-only mux. See `SKILL.md` for the full spec.
@@ -44,7 +44,7 @@ scripts/                 extract / tts / cut / assemble / hits / budget (stdlib 
 references/beat_prompt.md  beat-drafting prompt (fandom-canonical, coverage map)
 ```
 
-Your episode files, transcripts, maps, and renders stay local — never commit footage, subtitles, or clips.
+Your episode files, transcripts, maps, and renders stay local: never commit footage, subtitles, or clips.
 
 ## Note on footage
 
