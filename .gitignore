@@ -1,0 +1,4 @@
+# episode artifacts: NEVER commit footage, subtitles, maps, or renders
+# (copyrighted material + user-local files)
+samples/
+work/
