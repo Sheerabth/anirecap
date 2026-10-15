@@ -56,22 +56,23 @@ description: Turn anime episodes into narrated recap videos. Use when user says 
 ### Step 4 — Render (scripts only, no hand-cutting)
 ```
 python3 scripts/tts.py beats.json work/
-python3 scripts/budget.py beats.json work/vo_durations.json   # actuals vs weight targets, ±25% tolerance
+python3 scripts/budget.py beats.json work/vo_durations.json   # actuals vs weight targets, ±35% tolerance
 python3 scripts/cut.py <input.mkv> beats.json work/vo_durations.json work/
 python3 scripts/assemble.py work/ out.mp4
+python3 scripts/subs.py beats.json work/vo_durations.json work/   # voiceover.srt + .ass per episode (timing exact, no transcription)
 ```
 - TTS: one mp3 per beat (default `en-US-GuyNeural` via `uvx edge-tts`), concat to `vo_full.mp3`. Blob VO banned. Sizing: this voice floors at ~5s per sentence — write short sentences (w1 ≈ 10-14 words, w2 ≈ 20-26, w3 ≈ 30-38) or budget check fails and you re-trim.
 - Cut: video-only `-an`, 720p `libx264 veryfast crf23`, per-beat duration split evenly across clips.
 - Assemble: `montage.mp4` + `vo_full.mp3` → `-map 0:v -map 1:a -c:v copy -c:a aac -shortest`. Exactly 1 video + 1 audio stream. No anime audio ever.
 - Frame check: thumbnail every clip's first frame; reject black/fade-in opens (shift +2s) and OP/ED cards.
 
-### Step 5 — Subtitles + season assembly (optional sew step)
-Episode level owns everything; season level only assembles.
+- Subs stay sidecar at episode stage (mp4s keep clean); burn-in happens once at season assembly (single re-encode). Long beats split at sentence boundaries.
+
+### Step 5 — Season assembly (optional sew step)
+Episode level owns everything (clips, VO, subs); season level only assembles.
 ```
-python3 scripts/subs.py beats.json work/vo_durations.json work/   # voiceover.srt + .ass, timing exact by construction
 python3 scripts/season.py work/season_manifest.json season_S01.mp4
 ```
-- `subs.py`: one entry per beat (long beats split at sentence boundaries), timed to beat clip spans. No transcription. Keep episode mp4s clean + sidecar subs; burn once at season stage (single re-encode).
 - `season.py` manifest: list of `{video, srt, title, title_vo}` per episode in order. Per episode: generated title card (VO line via same TTS voice, card padded to match) + recap with subs burned in. Output: season mp4 + merged season `.srt` (offsets automatic) + `loudnorm` audio across episodes.
 - Concat uses the concat *filter* with normalized timebases (cards 30fps vs episodes 23.976fps) — never the concat demuxer with `-c copy`, which stretches video past audio.
 
