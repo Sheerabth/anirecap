@@ -4,6 +4,10 @@ Anime episodes in, narrated recap videos out. Fandom-canonical summaries fused w
 
 Battle-tested on a full 12-episode season (blind-agent verified: zero unassigned cues, all timestamps cue-exact). Bring your own episode files.
 
+## About
+
+**anirecap** turns anime episodes into narrated recap videos. It fuses a fandom-wiki episode summary with the episode's own subtitles: an agent maps every subtitle cue to a story beat (or to SKIP-with-reason for OPs, recaps, EDs, and previews), drafts fluent third-person voiceover sized by plot weight, cuts ~2-second clips that show each narrated line, and muxes a VO-only final with zero anime audio. Per-episode recaps sew into a season video with title cards, burned-in subs, and leveled audio. Inputs are your local episode files; everything renders with `ffmpeg` + free `edge-tts` — no API keys.
+
 ## The protocol (the whole thing)
 
 1. **Single source.** The fandom wiki episode page is canonical. Season context is gathered for *understanding only* — nothing enters the VO unless this episode's footage proves it.
