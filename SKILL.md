@@ -7,12 +7,12 @@ description: Turn anime episodes into narrated recap videos. Use when user says 
 
 ## Rules (global)
 
-1. **Fandom wins.** The fandom wiki episode page is the single canonical summary source. It beats Wikipedia, MAL, everything. If the episode page's summary section is blank/thin (happens — EP02's was blank), backfill ONLY from same-wiki character/location pages, and flag each backfilled beat `GAP-FILL` in the map. Never pull a second wiki silently.
+1. **Fandom wins.** The fandom wiki episode page is the single canonical summary source. It beats Wikipedia, MAL, everything. If the episode page's summary section is blank/thin (happens on small wikis), backfill ONLY from same-wiki character/location pages, and flag each backfilled beat `GAP-FILL` in the map. Never pull a second wiki silently.
 2. **Season context is for understanding, never for VO.** Fetch it the same way every time: (a) Wikipedia series premise (1 paragraph: who, skill, goal), (b) fandom character pages for anyone debuting/returning this episode (origin, ability, season role), (c) fandom episode list for position (what came before/after). Extract: premise + episode position + debutants + season drivers (wars, successions). Nothing enters the voiceover unless this episode's footage + cues prove it.
-3. **Skipped sections don't exist.** Opening songs, prior-episode recaps, ending songs, post-ED teasers, next-episode previews are excluded from the map, the clips, and the VO. Entirely. Boundary rules: mid-episode title cards (eyecatches) STAY inside their surrounding section; the episode ends at the last in-episode cue (ED theme / "Next time" card = SKIP even when story talk plays over them). Names: on-screen stats spelling wins for all spellings (transliteration varies across wiki pages — first stats-screen occurrence is canonical).
+3. **Skipped sections don't exist.** Opening songs, prior-episode recaps, ending songs, post-ED teasers, next-episode previews are excluded from the map, the clips, and the VO. Entirely. Detect OP/ED per episode from the transcript (`opening theme song playing` + title cards, `Next time` / preview) — never hardcode cue numbers, OP position moves between episodes. Boundary rules: mid-episode title cards (eyecatches) STAY inside their surrounding section; the episode ends at the last in-episode cue (ED theme / "Next time" card = SKIP even when story talk plays over them). Names: on-screen stats spelling wins for all spellings (transliteration varies across wiki pages — first stats-screen occurrence is canonical).
 4. **Fluent English VO.** Brainrot means fast cuts, never broken English. Full proper sentences only. Staccato fragments are banned.
-5. **No length cap.** Cover what the episode needs. ~60s/episode is typical; setup-heavy episodes run longer.
-6. **Weight decides screentime.** Every beat gets `weight` 1–3 at map time. Each weight point ≈ 4 seconds of VO (≈1 fluent sentence): weight 3 ≈ 12s / 3 sentences, 2 ≈ 8s / 2 sentences, 1 ≈ 4s / 1 sentence. Clips = `round(beat_seconds / 2)` so pace holds ~2s everywhere.
+5. **No length cap, no episode-number bonus.** Cover what the episode needs. Same weight rubric for every episode — EP01 gets no premium for being first. An episode runs longer only if it genuinely earns more KEEP beats. ~60s/episode is typical; genuinely dense episodes run longer.
+6. **Weight decides screentime, evenly.** Every beat gets `weight` 1–3 at map time, scored identically in every episode. Each weight point ≈ 4 seconds of VO (≈1 fluent sentence): weight 3 ≈ 12s / 3 sentences, 2 ≈ 8s / 2 sentences, 1 ≈ 4s / 1 sentence. Episode length = `sum(weights) × 4s`. Clips = `round(beat_seconds / 2)` so pace holds ~2s everywhere.
    - **3 — irreversible plot.** Recruitments, oaths, power reveals, abductions, duel outcomes, episode-title moments. Cutting it breaks the season.
    - **2 — stakes with setup.** Talent demos, motivating backstory, arranged confrontations, night-before reckonings.
    - **1 — bridges.** Travel, meals, market filler, lessons. Compress into montages.
@@ -47,7 +47,8 @@ description: Turn anime episodes into narrated recap videos. Use when user says 
 - Beats sorted STORY-chronological (time cards rule), not air order. Flash-forward cold opens dropped by default.
 - Every clip `start` is an exact subtitle cue start `HH:MM:SS.mmm`. No invented timestamps. Silent action anchored to nearest cue, `"approx": true`.
 - Prefer, in order: stat/ability screens, name declarations, impact reaction lines (gasps, "grazed him"), weapon draws/clashes, oath kneels, food/bribe gags. Talking-head filler only to bridge.
-- Pace: 4-7 clips per beat, each ≤2.1s after auto-split. No static shot breathes.
+- **VO / subs / clip lock (unbreakable).** Every clip must visually show what its beat's `vo_text` narrates, proven in the coverage map (wiki beat → cue timestamps + quotes → KEEP). Content-unchecked clips are banned — never evenly space clips across a range, never auto-grab nearby cue text as a quote, never illustrate a line with unrelated footage. If no cue-backed visual exists, rephrase the VO to what the footage proves or DROP the beat.
+- Pace: 4-7 clips per beat, each ~2s (allow up to 2.6s; dense text overlays ≤4s) after auto-split. No static shot breathes.
 
 ```json
 {"beats": [{"id": "b1", "vo_text": "...", "quote": "...", "time": "present", "clips": [{"start": "00:04:01.783"}]}]}
@@ -80,10 +81,11 @@ python3 scripts/season.py work/season_manifest.json season_S01.mp4
 
 - [ ] Coverage: map exists, every cue assigned, unassigned = 0
 - [ ] Sourcing: every beat traceable to a fandom beat + cue quotes; 0-hit content absent from VO
+- [ ] Lock: VO, subs, and video all agree per beat — each clip shows its VO line; no mismatched illustration
 - [ ] Chronology: story order; cold opens dropped unless hook style requested
 - [ ] Language: fluent complete sentences; no fragments
 - [ ] Audio: VO-only, 1 audio track
-- [ ] Sync: |video − VO| < 0.3s; each clip ≤2.1s (dense text overlays ≤4s)
+- [ ] Sync: |video − VO| < 0.3s; each clip ~2s (allow up to 2.6s; dense text overlays ≤4s)
 - [ ] Budget: every beat's VO within ±35% of `weight × 4s` (TTS floor ≈ 5s/sentence); total ≈ `sum(weights) × 4s`
 
 ## Tools

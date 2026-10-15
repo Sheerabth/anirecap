@@ -38,7 +38,7 @@ def shift_srt(srt_path, offset):
             text = "\n".join(lines[2:])
             out.append(f"{n}\n{to_x(to_s(a) + offset)} --> {to_x(to_s(b) + offset)}\n{text}")
             n += 1
-    return "\n\n".join(out) + "\n"
+    return "\n\n".join(out) + "\n\n"
 
 
 def main():
