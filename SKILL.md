@@ -65,6 +65,16 @@ python3 scripts/assemble.py work/ out.mp4
 - Assemble: `montage.mp4` + `vo_full.mp3` → `-map 0:v -map 1:a -c:v copy -c:a aac -shortest`. Exactly 1 video + 1 audio stream. No anime audio ever.
 - Frame check: thumbnail every clip's first frame; reject black/fade-in opens (shift +2s) and OP/ED cards.
 
+### Step 5 — Subtitles + season assembly (optional sew step)
+Episode level owns everything; season level only assembles.
+```
+python3 scripts/subs.py beats.json work/vo_durations.json work/   # voiceover.srt + .ass, timing exact by construction
+python3 scripts/season.py work/season_manifest.json season_S01.mp4
+```
+- `subs.py`: one entry per beat (long beats split at sentence boundaries), timed to beat clip spans. No transcription. Keep episode mp4s clean + sidecar subs; burn once at season stage (single re-encode).
+- `season.py` manifest: list of `{video, srt, title, title_vo}` per episode in order. Per episode: generated title card (VO line via same TTS voice, card padded to match) + recap with subs burned in. Output: season mp4 + merged season `.srt` (offsets automatic) + `loudnorm` audio across episodes.
+- Concat uses the concat *filter* with normalized timebases (cards 30fps vs episodes 23.976fps) — never the concat demuxer with `-c copy`, which stretches video past audio.
+
 ## Quality gates (all must pass)
 
 - [ ] Coverage: map exists, every cue assigned, unassigned = 0
